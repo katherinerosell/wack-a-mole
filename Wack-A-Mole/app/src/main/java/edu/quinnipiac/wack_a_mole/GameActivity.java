@@ -98,7 +98,6 @@ public class GameActivity extends AppCompatActivity{
      * Timer that counts down from a 60 seconds (initially)
      */
     public void runTimer() {
-        final TextView timeView = _timeText;
         handler = new Handler();
         handler.post(new Runnable() {
             @Override
@@ -106,8 +105,9 @@ public class GameActivity extends AppCompatActivity{
                 int min = (_seconds%3600)/60;
                 int sec = _seconds%60;
                 String time = String.format(Locale.getDefault(), "%02d:%02d", min, sec);
-                timeView.setText("Time Left: " + time);
+                _timeText.setText("Time Left: " + time);
                 if(_running){
+                    _timeText.setText("Time Left: " + time);
                     _seconds--;
                     if(sec%5 ==0){
                         _mainGameBackend.addMole();
@@ -158,12 +158,12 @@ public class GameActivity extends AppCompatActivity{
     public void imgButtonClick(View view) {
         if(_mainHolderClass.getGameBoard()[calcID(view.getId())] == 1){
             //destroy mole, add a point to score
-            _score = _score + 1;
+            _score++;
         }
         if(_mainHolderClass.getGameBoard()[calcID(view.getId())] == 0){
-            _score = _score -1;
+            _score--;
             _misses++;
-            if(_misses <= 5){
+            if(_misses >= 5){
                 endGame(_score);
             }
         }
