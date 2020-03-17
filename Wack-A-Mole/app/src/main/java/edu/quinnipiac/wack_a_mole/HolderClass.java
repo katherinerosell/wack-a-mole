@@ -15,7 +15,6 @@ import android.widget.ImageButton;
 public class HolderClass {
     private static ImageButton[] IMAGE_BUTTONS;
     private static int[] _gameboard;
-    private static int _score;
 
     public HolderClass(){
         IMAGE_BUTTONS = new ImageButton[9];

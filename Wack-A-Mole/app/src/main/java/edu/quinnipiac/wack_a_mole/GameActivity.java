@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
@@ -26,18 +29,20 @@ public class GameActivity extends AppCompatActivity{
 
     private HolderClass _mainHolderClass;
     private GameBackend _mainGameBackend;
+    private static Handler handler;
 
     private ImageButton[] _mainImageButtons = new ImageButton[9];
     private int[] _mainGameboard = new int[]{0,0,0,0,0,0,0,0,0};
 
-    private int _score;
+    private static int _score;
+    private static int _misses;
     private String playerName;
 
     //for my timer
     private static int _seconds;
     private boolean _running;
-    private TextView _scoreText;
-    private TextView _timeText;
+    private static TextView _scoreText;
+    private static TextView _timeText;
 
     private ShareActionProvider shareActionProvider;
 
@@ -47,42 +52,31 @@ public class GameActivity extends AppCompatActivity{
      * then recreated.
      * @param savedInstanceState
      */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_layout);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         if(savedInstanceState != null){
             _score = savedInstanceState.getInt("Score");
-            //_seconds = savedInstanceState.getInt("Seconds");
             _running = savedInstanceState.getBoolean("Running");
-            //_myTimer.setTime(_seconds);
-            //_mainGameboard = savedInstanceState.getIntArray("GameBoard");
-            Log.d(" -- Game Board -- ", "" + _mainGameboard);
-            //_mainHolderClass.setGameBoard(_mainGameboard);
             playerName = savedInstanceState.getString("PlayerName");
-            _scoreText = (TextView) findViewById(R.id.score_textview);
-            _scoreText.setText("Score: " + _score);
-            _timeText = (TextView) findViewById(R.id.countdown_timer);
-
+            _misses = savedInstanceState.getInt("Misses");
         } else{
             _seconds=60;
             _score = 0;
+            _misses = 0;
             _running = true;
-
         }
-
         _scoreText = (TextView) findViewById(R.id.score_textview);
-        _scoreText.setText("Score: " + _score);
+        _scoreText.setText(String.format("Score: %d", _score));
         _timeText = (TextView) findViewById(R.id.countdown_timer);
         //Display welcome text with player name
         TextView welcomeText = (TextView) findViewById(R.id.welcome_text);
         playerName = (String) getIntent().getExtras().get("PlayerName");
         welcomeText.setText("Welcome, "+ playerName + "!");
-        //Set and display timer
-        //_myTimer.setTime(_seconds);
-
         //Begin the game code. Set up the HolderClass, ImageButton[], int[] gameboard, MyTimer classes.
         _mainHolderClass = new HolderClass();
         //Add all ImageButtons in game_layout to array.
@@ -93,13 +87,9 @@ public class GameActivity extends AppCompatActivity{
             _mainImageButtons[i] = findViewById(btnID);
             //Log.d("Image Button  ", "" + _mainImageButtons[i]);
         }
-
         _mainHolderClass.setImageButtonsArray(_mainImageButtons);
         _mainHolderClass.setGameBoard(_mainGameboard);
         _mainGameBackend = new GameBackend(_mainHolderClass);
-        //final TextView _timeText = (TextView) findViewById(R.id.countdown_timer);
-        //_myTimer = new MyTimer(60, timeText,true, _mainHolderClass);
-        //_myTimer.runTimer();
         runTimer();
     }
 
@@ -108,24 +98,26 @@ public class GameActivity extends AppCompatActivity{
      * Timer that counts down from a 60 seconds (initially)
      */
     public void runTimer() {
-        final Handler handler = new Handler();
+        final TextView timeView = _timeText;
+        handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
                 int min = (_seconds%3600)/60;
                 int sec = _seconds%60;
                 String time = String.format(Locale.getDefault(), "%02d:%02d", min, sec);
-                _timeText.setText("Time Left: " + time);
+                timeView.setText("Time Left: " + time);
                 if(_running){
                     _seconds--;
-                    if(_seconds%5 ==0){
+                    if(sec%5 ==0){
                         _mainGameBackend.addMole();
                         Log.d("** Create New Mole ** ","--------   make new mole   -------");
                     }
+                    Log.d("** Seconds ** ","--------   " + _seconds);
                     if(_seconds<=0){
                         _running = false;
                         handler.removeCallbacks(this);
-                        //end_game();
+                        endGame(_score);
                     }
                     handler.postDelayed(this, 1000);//post code to be run again after 1000 milliseconds, or 1 second
                 }
@@ -133,6 +125,28 @@ public class GameActivity extends AppCompatActivity{
         });
     }
 
+    //reset the timer and score
+    public void resetTimer(View view) {
+        //This code DOES NOT WORK....
+        _seconds = 60;
+        _score = 0;
+        _running = true;
+    }
+    //pause the timer by setting the boolean to run the code as false
+    public void pauseTimer(View view) {
+        _running = false;
+    }
+
+    private void endGame(int endScore){
+        _timeText.setText("TIME'S UP!");
+        if(endScore < 5){
+            Toast.makeText(GameActivity.this, "You Lose! Sorry, try again!", Toast.LENGTH_LONG).show();
+        }
+        if(endScore > 5){
+            Toast.makeText(GameActivity.this, "You Win! Share your score with friends!", Toast.LENGTH_LONG).show();
+        }
+
+    }
 
     /**
      * imgButtonClick
@@ -141,18 +155,20 @@ public class GameActivity extends AppCompatActivity{
      * If NONE clicked : subtract 1 from score!
      * @param view
      */
-
     public void imgButtonClick(View view) {
         if(_mainHolderClass.getGameBoard()[calcID(view.getId())] == 1){
-            //Log.d("IMG BUTN CLICKed --   ", calcID(view.getId()) + "");
             //destroy mole, add a point to score
-            _score++;
+            _score = _score + 1;
         }
         if(_mainHolderClass.getGameBoard()[calcID(view.getId())] == 0){
-            _score--;
+            _score = _score -1;
+            _misses++;
+            if(_misses <= 5){
+                endGame(_score);
+            }
         }
         _scoreText.setText("Score: " + _score);
-        //_myTimer.sendButtonClicked();//button has been clicked, clear the board
+        Log.d("** SCORE ** ","--------  "+ _score + "  -------");
         _mainGameBackend.clearBoard();
     }
 
@@ -202,7 +218,6 @@ public class GameActivity extends AppCompatActivity{
      * Action Bar!
      * Basically just allow the user to send their score through an intent
      */
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         //inflate the menu, this adds items to the app bar!
@@ -230,8 +245,6 @@ public class GameActivity extends AppCompatActivity{
         }
     }
 
-
-
     /**
      * Save Instance State onDestroy
      * Save the following:
@@ -242,16 +255,12 @@ public class GameActivity extends AppCompatActivity{
      * - gameboard int[]
      * - playerName
      */
-
     public void onSavedInstanceState(Bundle savedInstanceState){
         savedInstanceState.putInt("Score", _score);
         savedInstanceState.putString("PlayerName", playerName);
-        //_seconds = _myTimer.getTime();
         savedInstanceState.putInt("Seconds", _seconds);
-        //_running = _myTimer.getRunning();
+        savedInstanceState.putInt("Misses", _misses);
         savedInstanceState.putBoolean("Running", _running);
-        //_mainGameboard = _mainHolderClass.getGameBoard();
-        //savedInstanceState.putIntArray("GameBoard", _mainGameboard);
     }
 
 }

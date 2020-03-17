@@ -70,7 +70,7 @@
                 android:layout_marginRight="20dp"
                 android:lineSpacingExtra="8sp"
                 android:padding="8dp"
-                android:text="3. Be careful not to miss! 10 misses and you lose the game!"
+                android:text="3. Be careful not to miss! 5 misses and you lose the game!"
                 android:textAlignment="center"
                 android:textSize="22sp" />
 
@@ -96,7 +96,7 @@
                 android:layout_marginRight="20dp"
                 android:lineSpacingExtra="8sp"
                 android:padding="8dp"
-                android:text="You have 1 minute to tap as many moles as possible! Your score has to be greater than 7/12 to win!!"
+                android:text="You have 1 minute to tap as many moles as possible! Your score has to be greater than 5 to win!!"
                 android:textAlignment="center"
                 android:textSize="20sp" />
 
