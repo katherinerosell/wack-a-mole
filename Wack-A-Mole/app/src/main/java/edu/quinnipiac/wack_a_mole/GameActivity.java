@@ -2,6 +2,7 @@ package edu.quinnipiac.wack_a_mole;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
+import java.util.Locale;
 
 
 /**
@@ -23,7 +25,7 @@ import androidx.core.view.MenuItemCompat;
 public class GameActivity extends AppCompatActivity{
 
     private HolderClass _mainHolderClass;
-    private MyTimer _myTimer = new MyTimer();//timer using an instance of a class
+    private GameBackend _mainGameBackend;
 
     private ImageButton[] _mainImageButtons = new ImageButton[9];
     private int[] _mainGameboard = new int[]{0,0,0,0,0,0,0,0,0};
@@ -31,9 +33,11 @@ public class GameActivity extends AppCompatActivity{
     private int _score;
     private String playerName;
 
+    //for my timer
     private static int _seconds;
     private boolean _running;
     private TextView _scoreText;
+    private TextView _timeText;
 
     private ShareActionProvider shareActionProvider;
 
@@ -53,26 +57,31 @@ public class GameActivity extends AppCompatActivity{
             _score = savedInstanceState.getInt("Score");
             //_seconds = savedInstanceState.getInt("Seconds");
             _running = savedInstanceState.getBoolean("Running");
-            _myTimer.setTime(_seconds);
+            //_myTimer.setTime(_seconds);
             //_mainGameboard = savedInstanceState.getIntArray("GameBoard");
             Log.d(" -- Game Board -- ", "" + _mainGameboard);
             //_mainHolderClass.setGameBoard(_mainGameboard);
             playerName = savedInstanceState.getString("PlayerName");
+            _scoreText = (TextView) findViewById(R.id.score_textview);
+            _scoreText.setText("Score: " + _score);
+            _timeText = (TextView) findViewById(R.id.countdown_timer);
 
         } else{
-            _seconds=0;
+            _seconds=60;
             _score = 0;
-            _running = false;
+            _running = true;
+
         }
 
         _scoreText = (TextView) findViewById(R.id.score_textview);
         _scoreText.setText("Score: " + _score);
+        _timeText = (TextView) findViewById(R.id.countdown_timer);
         //Display welcome text with player name
         TextView welcomeText = (TextView) findViewById(R.id.welcome_text);
         playerName = (String) getIntent().getExtras().get("PlayerName");
         welcomeText.setText("Welcome, "+ playerName + "!");
         //Set and display timer
-        _myTimer.setTime(_seconds);
+        //_myTimer.setTime(_seconds);
 
         //Begin the game code. Set up the HolderClass, ImageButton[], int[] gameboard, MyTimer classes.
         _mainHolderClass = new HolderClass();
@@ -87,37 +96,43 @@ public class GameActivity extends AppCompatActivity{
 
         _mainHolderClass.setImageButtonsArray(_mainImageButtons);
         _mainHolderClass.setGameBoard(_mainGameboard);
-        final TextView timeText = (TextView) findViewById(R.id.countdown_timer);
-        _myTimer = new MyTimer(60, timeText,true, _mainHolderClass);
-        _myTimer.runTimer();
-
-
-        /**
-        //Set the score text
-        _scoreText = (TextView) findViewById(R.id.score_textview);
-
-        //Display the Player's name.
-        TextView welcomeText = (TextView) findViewById(R.id.welcome_text);
-        playerName = (String) getIntent().getExtras().get("PlayerName");
-        welcomeText.setText("Welcome, "+ playerName + "!");
-
-        //Begin the game code. Set up the HolderClass, ImageButton[], int[] gameboard, MyTimer classes.
-        _mainHolderClass = new HolderClass();
-        //Add all ImageButtons in game_layout to array.
-        for (int i = 0; i < 9; i++){
-            String imgButtonID = "button_" + i;
-            //resource ID to pass to find new ID
-            int btnID = getResources().getIdentifier(imgButtonID, "id", getPackageName());
-            _mainImageButtons[i] = findViewById(btnID);
-            Log.d("Image Button  ", "" + _mainImageButtons[i]);
-        }
-        _mainHolderClass.setImageButtonsArray(_mainImageButtons);
-        _mainHolderClass.setGameBoard(_mainGameboard);
-        final TextView timeText = (TextView) findViewById(R.id.countdown_timer);
-        _myTimer = new MyTimer(60, timeText,true, _mainHolderClass);
-        _myTimer.runTimer();
-         **/
+        _mainGameBackend = new GameBackend(_mainHolderClass);
+        //final TextView _timeText = (TextView) findViewById(R.id.countdown_timer);
+        //_myTimer = new MyTimer(60, timeText,true, _mainHolderClass);
+        //_myTimer.runTimer();
+        runTimer();
     }
+
+    /**
+     * runTimer
+     * Timer that counts down from a 60 seconds (initially)
+     */
+    public void runTimer() {
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                int min = (_seconds%3600)/60;
+                int sec = _seconds%60;
+                String time = String.format(Locale.getDefault(), "%02d:%02d", min, sec);
+                _timeText.setText("Time Left: " + time);
+                if(_running){
+                    _seconds--;
+                    if(_seconds%5 ==0){
+                        _mainGameBackend.addMole();
+                        Log.d("** Create New Mole ** ","--------   make new mole   -------");
+                    }
+                    if(_seconds<=0){
+                        _running = false;
+                        handler.removeCallbacks(this);
+                        //end_game();
+                    }
+                    handler.postDelayed(this, 1000);//post code to be run again after 1000 milliseconds, or 1 second
+                }
+            }
+        });
+    }
+
 
     /**
      * imgButtonClick
@@ -137,7 +152,8 @@ public class GameActivity extends AppCompatActivity{
             _score--;
         }
         _scoreText.setText("Score: " + _score);
-        _myTimer.sendButtonClicked();//button has been clicked, clear the board
+        //_myTimer.sendButtonClicked();//button has been clicked, clear the board
+        _mainGameBackend.clearBoard();
     }
 
     /**
@@ -230,9 +246,9 @@ public class GameActivity extends AppCompatActivity{
     public void onSavedInstanceState(Bundle savedInstanceState){
         savedInstanceState.putInt("Score", _score);
         savedInstanceState.putString("PlayerName", playerName);
-        _seconds = _myTimer.getTime();
+        //_seconds = _myTimer.getTime();
         savedInstanceState.putInt("Seconds", _seconds);
-        _running = _myTimer.getRunning();
+        //_running = _myTimer.getRunning();
         savedInstanceState.putBoolean("Running", _running);
         //_mainGameboard = _mainHolderClass.getGameBoard();
         //savedInstanceState.putIntArray("GameBoard", _mainGameboard);

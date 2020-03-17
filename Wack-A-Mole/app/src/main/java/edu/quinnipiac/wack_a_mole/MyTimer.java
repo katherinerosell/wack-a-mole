@@ -61,8 +61,6 @@ public class MyTimer extends AppCompatActivity {
         //ask user to restart?
     }
 
-
-
     public int getTime(){
         return _seconds;
     }
@@ -75,15 +73,6 @@ public class MyTimer extends AppCompatActivity {
 
     public void setRunning(boolean myRunning){
         _running = myRunning;
-    }
-
-    public void sendButtonClicked(){
-        _gameBackend.imgButtonClicked();
-    }
-
-    public int getScore(){
-        int score =_gameBackend.retrieveScore();
-        return score;
     }
 
 }

@@ -70,8 +70,6 @@
                 android:id="@+id/button_0"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -80,7 +78,6 @@
                 android:id="@+id/button_1"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginBottom="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -89,8 +86,6 @@
                 android:id="@+id/button_2"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -99,7 +94,6 @@
                 android:id="@+id/button_3"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginEnd="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -116,7 +110,6 @@
                 android:id="@+id/button_5"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginEnd="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -125,8 +118,6 @@
                 android:id="@+id/button_6"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -135,7 +126,6 @@
                 android:id="@+id/button_7"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginTop="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />
@@ -144,8 +134,6 @@
                 android:id="@+id/button_8"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
                 android:background="@drawable/green_square"
                 android:contentDescription="@string/button_contentDesc"
                 android:onClick="imgButtonClick" />

@@ -63,10 +63,6 @@ public class GameBackend implements CheckMole {
         _holderClass.setImageButtonsArray(_imageButtons);
     }
 
-    public void imgButtonClicked() {
-            clearBoard();
-    }
-
     /**
      * calcID
      * Calculate the "index" according to the ID from the view object clicked.
