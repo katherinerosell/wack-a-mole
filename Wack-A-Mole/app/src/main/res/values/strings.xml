@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Wack-A-Mole</string>
+    <string name="plaintxt_hint">Enter Your Name</string>
+    <string name="button_contentDesc"> </string>
+</resources>
