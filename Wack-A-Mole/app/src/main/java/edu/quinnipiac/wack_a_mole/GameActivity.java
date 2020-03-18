@@ -107,7 +107,7 @@ public class GameActivity extends AppCompatActivity{
                 String time = String.format(Locale.getDefault(), "%02d:%02d", min, sec);
                 _timeText.setText("Time Left: " + time);
                 if(_running){
-                    _timeText.setText("Time Left: " + time);
+                    //_timeText.setText("Time Left: " + time);
                     _seconds--;
                     if(sec%5 ==0){
                         _mainGameBackend.addMole();
@@ -133,19 +133,22 @@ public class GameActivity extends AppCompatActivity{
         _running = true;
     }
     //pause the timer by setting the boolean to run the code as false
-    public void pauseTimer(View view) {
-        _running = false;
-    }
+    public void pauseTimer(View view) { _running = false; }
 
+    /**
+     * endGame
+     * Called when time is up or when the player misses 5 times
+     * @param endScore
+     */
     private void endGame(int endScore){
         _timeText.setText("TIME'S UP!");
+        _running = false;
         if(endScore < 5){
             Toast.makeText(GameActivity.this, "You Lose! Sorry, try again!", Toast.LENGTH_LONG).show();
         }
         if(endScore > 5){
             Toast.makeText(GameActivity.this, "You Win! Share your score with friends!", Toast.LENGTH_LONG).show();
         }
-
     }
 
     /**
@@ -164,6 +167,8 @@ public class GameActivity extends AppCompatActivity{
             _score--;
             _misses++;
             if(_misses >= 5){
+                _seconds = 0;
+                _running = false;
                 endGame(_score);
             }
         }

@@ -21,7 +21,6 @@ public class HolderClass {
         _gameboard = new int[]{0,0,0,0,0,0,0,0,0};
     }
 
-
     public void setImageButtonsArray(ImageButton[] imgButtons){
         for(int i = 0; i < 9; i++){
             IMAGE_BUTTONS[i] = imgButtons[i];
